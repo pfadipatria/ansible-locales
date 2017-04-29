@@ -1,0 +1,30 @@
+---
+
+- name: Install locales
+  package: name=locales state=present
+
+- name: Configure locales
+  template:
+    src: etc/locale.gen.j2
+    dest: /etc/locale.gen
+    owner: root
+    group: root
+    mode: 0644
+  register: locales_configure_locales
+
+- name: Configure default locale
+  template:
+    src: etc/default/locale.j2
+    dest: /etc/default/locale
+    owner: root
+    group: root
+    mode: 0644
+  register: locales_configure_default
+
+- name: Regenerate locales
+  command: locale-gen
+  when: locales_configure_locales.changed
+
+#- name: Update (default) locales
+#  command: update-locale
+#  when: locales_configure_default.changed
